@@ -1,49 +1,86 @@
 import datetime
+from dataclasses import dataclass
 
 
-class Access:
-    def __set_name__(self, owner, name: str):
-        self.public_name = name
-        self.private_name = '_' + name
-
-    def __get__(self, obj, objtype=None):
-        value = getattr(obj, self.private_name)
-        return value
-
-    def __set__(self, obj, value):
-        setattr(obj, self.private_name, value)
-
-
-class Author:
-    full_name = Access()
-    bio = Access()
-    book_list = Access()
-
-    def __init__(self, full_name: str, bio: str = None, book_list: list = None):
-        self.full_name = full_name
-        self.bio = bio
-        self.book_list = book_list
-
-    def add_book(self, book_name: str):
-        self.book_list.append(book_name)
-
-
+@dataclass
 class Book:
-    name = Access()
-    year = Access()
-    isbn = Access()
-    price = Access()
+    _name: str
+    _year: int
+    _isbn: str
+    _price: float
 
-    def __init__(self, name: str, year: int, isbn: str, price: float):
-        self.name = name
-        self.year = year
-        self.isbn = isbn
-        self.price = price
+    @property
+    def name(self) -> str:
+        return self._name
 
-    def age_of_book(self):
-        return datetime.datetime.now().year - self.year
+    @name.setter
+    def name(self, name: str) -> None:
+        self._name = name
 
-# book = Book("Book1", 2000, 1234567890, 23)
-# author = Author("Tom Rick", "Writer", ["book1", "book2"])
-# author.add_book("book3")
-# print(author.book_list)
+    @property
+    def year(self) -> int:
+        return self._year
+
+    @year.setter
+    def year(self, year: int) -> None:
+        if self.year > datetime.datetime.now().year:
+            raise ValueError(f"Year of book must be <= {datetime.datetime.now().year}")
+        self._year = year
+
+    @property
+    def isbn(self) -> str:
+        return self._isbn
+
+    @isbn.setter
+    def isbn(self, isbn: str) -> None:
+        if isbn.isnumeric() and len(isbn) == 13:
+            self._isbn = isbn
+        raise ValueError("ISBN must consist 13 numeric simbols")
+
+
+    @property
+    def price(self) -> float:
+        return self._price
+
+    @price.setter
+    def price(self, price: float) -> None:
+        self._price = price
+
+
+    def age_of_book(self) -> int:
+        return datetime.datetime.now().year - self._year
+
+
+@dataclass
+class Author:
+    _full_name: str
+    _bio: str
+    _book_list: list[Book]
+
+    @property
+    def full_name(self) -> str:
+        return self._full_name
+
+    @full_name.setter
+    def full_name(self, full_name: str) -> None:
+        self._full_name = full_name
+
+    @property
+    def bio(self) -> str:
+        return self._bio
+
+    @bio.setter
+    def bio(self, bio: str) -> None:
+        self._bio = bio
+
+    @property
+    def book_list(self) -> list[Book]:
+        return self._book_list
+
+    @book_list.setter
+    def book_list(self, book_list: list[Book]) -> None:
+        self._book_list = book_list
+
+
+    def add_book(self, book: Book):
+        self._book_list.append(book)
