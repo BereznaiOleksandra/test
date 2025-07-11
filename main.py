@@ -4,83 +4,72 @@ from dataclasses import dataclass
 
 @dataclass
 class Book:
-    _name: str
-    _year: int
-    _isbn: str
-    _price: float
+    title: str
+    year: int
+    isbn: str
+    price: float
 
-    @property
-    def name(self) -> str:
-        return self._name
+    def get_title(self) -> str:
+        return self.title
 
-    @name.setter
-    def name(self, name: str) -> None:
-        self._name = name
+    def update_title(self, title: str) -> None:
+        if not title:
+            raise ValueError("Title can not be empty")
+        self.title = title
 
-    @property
-    def year(self) -> int:
-        return self._year
+    def get_year(self) -> int:
+        return self.year
 
-    @year.setter
-    def year(self, year: int) -> None:
+    def update_year(self, year: int) -> None:
         if self.year > datetime.datetime.now().year:
             raise ValueError(f"Year of book must be <= {datetime.datetime.now().year}")
-        self._year = year
+        self.year = year
 
-    @property
-    def isbn(self) -> str:
-        return self._isbn
+    def get_isbn(self) -> str:
+        return self.isbn
 
-    @isbn.setter
-    def isbn(self, isbn: str) -> None:
+    def update_isbn(self, isbn: str) -> None:
         if isbn.isnumeric() and len(isbn) == 13:
-            self._isbn = isbn
+            self.isbn = isbn
         raise ValueError("ISBN must consist 13 numeric simbols")
 
+    def get_price(self) -> float:
+        return self.price
 
-    @property
-    def price(self) -> float:
-        return self._price
-
-    @price.setter
-    def price(self, price: float) -> None:
-        self._price = price
+    def update_price(self, price: float) -> None:
+        if price < 0:
+            raise ValueError("Price can not be negative")
+        self.price = price
 
 
     def age_of_book(self) -> int:
-        return datetime.datetime.now().year - self._year
+        return datetime.datetime.now().year - self.year
 
 
 @dataclass
 class Author:
-    _full_name: str
-    _bio: str
-    _book_list: list[Book]
+    full_name: str
+    bio: str
+    book_list: list[Book]
 
-    @property
-    def full_name(self) -> str:
-        return self._full_name
+    def get_full_name(self) -> str:
+        return self.full_name
 
-    @full_name.setter
-    def full_name(self, full_name: str) -> None:
-        self._full_name = full_name
+    def update_full_name(self, full_name: str) -> None:
+        self.full_name = full_name
 
-    @property
-    def bio(self) -> str:
-        return self._bio
+    def get_bio(self) -> str:
+        return self.bio
 
-    @bio.setter
-    def bio(self, bio: str) -> None:
-        self._bio = bio
+    def update_bio(self, bio: str) -> None:
+        self.bio = bio
 
-    @property
-    def book_list(self) -> list[Book]:
-        return self._book_list
+    def get_book_list(self) -> list[Book]:
+        return self.book_list
 
-    @book_list.setter
-    def book_list(self, book_list: list[Book]) -> None:
-        self._book_list = book_list
+    def update_book_list(self, book_list: list[Book]) -> None:
+        self.book_list = book_list
 
 
     def add_book(self, book: Book):
-        self._book_list.append(book)
+        self.book_list.append(book)
