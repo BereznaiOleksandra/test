@@ -1,6 +1,8 @@
 import datetime
 
-from factory import BookFactory, AuthorFactory
+from factory import AuthorFactory, BookFactory
+
+from app.main import BookFixDiscount, BookPersentDiscount
 
 
 def test_add_book():
@@ -22,9 +24,25 @@ def test_book_older_than_5_years():
     author.add_book(book)
     assert author.book_list[-1].age_of_book() > 5
 
+
 def test_book_younger_than_5_years():
     year = datetime.datetime.now().year - 4
     book = BookFactory.build(year=year)
     author = AuthorFactory.build()
     author.add_book(book)
     assert author.book_list[-1].age_of_book() < 5
+
+
+def test_book_zero_discount():
+    book = BookFactory.build(price=20.6)
+    assert book.final_price() == book.price
+
+
+def test_book_fix_discount():
+    book = BookFactory.build(price=200, discount=BookFixDiscount(20))
+    assert book.final_price() == 180
+
+
+def test_book_persent_discount():
+    book = BookFactory.build(price=200, discount=BookPersentDiscount(30))
+    assert book.final_price() == 140

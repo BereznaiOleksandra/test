@@ -1,5 +1,30 @@
 import datetime
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
+
+
+class BookDiscount(ABC):
+    def __init__(self, discount: float = 0):
+        self.discount = discount
+
+    @abstractmethod
+    def apply(self, price: float):
+        pass
+
+
+class BookZeroDiscount(BookDiscount):
+    def apply(self, price: float) -> float:
+        return price
+
+
+class BookFixDiscount(BookDiscount):
+    def apply(self, price: float) -> float:
+        return price - self.discount
+
+
+class BookPersentDiscount(BookDiscount):
+    def apply(self, price: float) -> float:
+        return price - self.discount * price / 100
 
 
 @dataclass
@@ -8,6 +33,7 @@ class Book:
     year: int
     isbn: str
     price: float
+    discount: BookDiscount = BookZeroDiscount()
 
     def get_title(self) -> str:
         return self.title
@@ -41,9 +67,11 @@ class Book:
             raise ValueError("Price can not be negative")
         self.price = price
 
-
     def age_of_book(self) -> int:
         return datetime.datetime.now().year - self.year
+
+    def final_price(self) -> float:
+        return self.discount.apply(self.price)
 
 
 @dataclass
@@ -70,6 +98,24 @@ class Author:
     def update_book_list(self, book_list: list[Book]) -> None:
         self.book_list = book_list
 
-
     def add_book(self, book: Book):
         self.book_list.append(book)
+
+
+class LibraryCatalog:
+    def __init__(self):
+        self.books = []
+
+    def add_book(self, book: Book):
+        self.books.append(book)
+
+    def remove_book(self, isbn):
+        for book in self.books:
+            if book.isbn == isbn:
+                self.books.remove(book)
+
+    def search_book(self, isbn):
+        for book in self.books:
+            if book.isbn == isbn:
+                return book
+        return None

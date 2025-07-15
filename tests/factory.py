@@ -1,8 +1,7 @@
 from faker import Faker
-
-from main import Book, Author
-
 from polyfactory.factories import DataclassFactory
+
+from app.main import Author, Book, BookZeroDiscount
 
 
 class BookFactory(DataclassFactory[Book]):
@@ -23,6 +22,10 @@ class BookFactory(DataclassFactory[Book]):
     @classmethod
     def price(cls):
         return Faker().random_number(digits=2, fix_len=False)
+
+    @classmethod
+    def discount(cls):
+        return BookZeroDiscount()
 
 
 class AuthorFactory(DataclassFactory[Author]):
