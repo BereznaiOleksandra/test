@@ -1,7 +1,6 @@
 import datetime
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Dict, Optional
 
 
 class AbstractPriceDiscount(ABC):
@@ -105,7 +104,7 @@ class Author:
 
 class LibraryCatalog:
     def __init__(self) -> None:
-        self.books: Dict[str, Book] = {}
+        self.books: dict[str, Book] = {}
 
     def add_book(self, book: Book) -> None:
         if book.isbn in self.books:
@@ -118,7 +117,7 @@ class LibraryCatalog:
             return True
         return False
 
-    def search_book(self, isbn: str) -> Optional[Book]:
+    def search_book(self, isbn: str) -> Book | None:
         return self.books.get(isbn)
 
     def total_cost(self) -> float:
