@@ -1,11 +1,55 @@
 [project]
 name = "test-july"
 version = "0.1.0"
-description = "Add your description here"
+description = "Description of project"
 readme = "README.md"
 requires-python = ">=3.13"
+
 dependencies = [
     "polyfactory>=2.22.0",
     "pytest>=8.4.1",
     "ruff==0.12.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "flake8",
+    "isort",
+    "mypy",
+    "pytest",
+    "pre-commit",
+    "ruff",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py313"]
+skip-string-normalization = false
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+
+[tool.mypy]
+python_version = "3.13"
+ignore_missing_imports = true
+strict = true
+explicit_package_bases = true
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+select = ["E", "F", "I"]
+fix = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
 ]
