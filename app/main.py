@@ -1,28 +1,29 @@
 import datetime
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Dict, Optional
 
 
-class BookDiscount(ABC):
+class AbstractPriceDiscount(ABC):
     def __init__(self, discount: float = 0):
         self.discount = discount
 
     @abstractmethod
-    def apply(self, price: float):
+    def apply(self, price: float) -> float:
         pass
 
 
-class BookZeroDiscount(BookDiscount):
+class BookZeroDiscount(AbstractPriceDiscount):
     def apply(self, price: float) -> float:
         return price
 
 
-class BookFixDiscount(BookDiscount):
+class BookFixDiscount(AbstractPriceDiscount):
     def apply(self, price: float) -> float:
         return price - self.discount
 
 
-class BookPersentDiscount(BookDiscount):
+class BookPersentDiscount(AbstractPriceDiscount):
     def apply(self, price: float) -> float:
         return price - self.discount * price / 100
 
@@ -33,7 +34,7 @@ class Book:
     year: int
     isbn: str
     price: float
-    discount: BookDiscount = BookZeroDiscount()
+    discount: AbstractPriceDiscount = BookZeroDiscount()
 
     def get_title(self) -> str:
         return self.title
@@ -98,24 +99,35 @@ class Author:
     def update_book_list(self, book_list: list[Book]) -> None:
         self.book_list = book_list
 
-    def add_book(self, book: Book):
+    def add_book(self, book: Book) -> None:
         self.book_list.append(book)
 
 
 class LibraryCatalog:
-    def __init__(self):
-        self.books = []
+    def __init__(self) -> None:
+        self.books: Dict[str, Book] = {}
 
-    def add_book(self, book: Book):
-        self.books.append(book)
+    def add_book(self, book: Book) -> None:
+        if book.isbn in self.books:
+            raise ValueError(f"Book with ISBN {book.isbn} already exists.")
+        self.books[book.isbn] = book
 
-    def remove_book(self, isbn):
-        for book in self.books:
-            if book.isbn == isbn:
-                self.books.remove(book)
+    def remove_book(self, isbn: str) -> bool:
+        if isbn in self.books:
+            del self.books[isbn]
+            return True
+        return False
 
-    def search_book(self, isbn):
-        for book in self.books:
-            if book.isbn == isbn:
-                return book
-        return None
+    def search_book(self, isbn: str) -> Optional[Book]:
+        return self.books.get(isbn)
+
+    def total_cost(self) -> float:
+        return sum(book.price for book in self.books.values())
+
+
+def main() -> None:
+    pass
+
+
+if __name__ == "__main__":
+    main()
