@@ -2,7 +2,13 @@ import datetime
 
 from factory import AuthorFactory, BookFactory
 
-from app.main import BookFixDiscount, BookPersentDiscount, LibraryCatalog
+from app.main import (
+    BookFixDiscount,
+    BookPersentDiscount,
+    CatalogDTO,
+    LibraryCatalog,
+    catalog_to_json,
+)
 
 
 def test_add_book() -> None:
@@ -85,3 +91,27 @@ def test_total_cost_library_catalog() -> None:
     catalog.add_book(book1)
     catalog.add_book(book2)
     assert catalog.total_cost() == 30
+
+
+def test_catalog_to_json() -> None:
+    catalog_json = (
+        "{"
+        '"authors": ['
+        "{"
+        '"id": 1, '
+        '"full_name": "Tom Black", '
+        '"bio": "Good author in Poland"'
+        "}"
+        "], "
+        '"books": ['
+        "{"
+        '"isbn": "1234567890123", '
+        '"title": "Harry Potter", '
+        '"year": 2024, "price": 20.5, '
+        '"authorId": 1'
+        "}"
+        "]"
+        "}"
+    )
+    catalog = CatalogDTO.model_validate_json(catalog_json)
+    assert catalog == CatalogDTO.model_validate_json(catalog_to_json(catalog))
