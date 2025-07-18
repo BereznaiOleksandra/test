@@ -3,10 +3,11 @@ name = "test-july"
 version = "0.1.0"
 description = "Description of project"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 
 dependencies = [
     "polyfactory>=2.22.0",
+    "pydantic>=2.11.7",
     "pytest>=8.4.1",
     "ruff==0.12.2",
 ]
@@ -24,7 +25,7 @@ dev = [
 
 [tool.black]
 line-length = 88
-target-version = ["py313"]
+target-version = ["py311"]
 skip-string-normalization = false
 
 [tool.isort]
@@ -36,8 +37,9 @@ max-line-length = 88
 extend-ignore = ["E203", "W503"]
 
 [tool.mypy]
-python_version = "3.13"
-ignore_missing_imports = true
+python_version = "3.11"
+ignore_missing_imports = false
+plugins = ["pydantic.mypy"]
 strict = true
 explicit_package_bases = true
 
