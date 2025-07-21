@@ -1,9 +1,8 @@
 import datetime
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Annotated
 
-from pydantic import AfterValidator, BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class AbstractPriceDiscount(ABC):
@@ -133,24 +132,28 @@ class AuthorDTO(BaseModel):
     bio: str
 
 
-def check_isbn(value: str) -> str:
-    if not value.isnumeric() or len(value) != 13:
-        raise ValueError("ISBN must consist 13 numeric simbols")
-    return value
-
-
-def check_year(value: int) -> int:
-    if value < 0 or value > datetime.datetime.now().year:
-        raise ValueError(f"Year of book must be <= {datetime.datetime.now().year}")
-    return value
-
-
 class BookDTO(BaseModel):
-    isbn: Annotated[str, AfterValidator(check_isbn)]
+    isbn: str
     title: str
-    year: Annotated[int, AfterValidator(check_year)]
+    year: int
     price: float
     authorId: int
+
+    @field_validator("isbn")
+    @classmethod
+    def check_isbn(cls, value: str) -> str:
+        if not value.isnumeric() or len(value) != 13:
+            raise ValueError("ISBN must consist 13 numeric simbols")
+        return value
+
+    @field_validator("year")
+    @classmethod
+    def check_year(cls, value: int) -> int:
+        if value < 0 or value > datetime.datetime.now().year:
+            raise ValueError(
+                f"Year of book must be positive and <= {datetime.datetime.now().year}"
+            )
+        return value
 
 
 class CatalogDTO(BaseModel):

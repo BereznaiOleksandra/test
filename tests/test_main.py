@@ -1,6 +1,9 @@
 import datetime
+import json
+import pathlib
 
-from factory import AuthorFactory, BookFactory
+import pytest
+from pydantic import ValidationError
 
 from app.main import (
     BookFixDiscount,
@@ -9,6 +12,7 @@ from app.main import (
     LibraryCatalog,
     catalog_to_json,
 )
+from factories import AuthorFactory, BookDTOFactory, BookFactory, CatalogDTOFactory
 
 
 def test_add_book() -> None:
@@ -94,24 +98,20 @@ def test_total_cost_library_catalog() -> None:
 
 
 def test_catalog_to_json() -> None:
-    catalog_json = (
-        "{"
-        '"authors": ['
-        "{"
-        '"id": 1, '
-        '"full_name": "Tom Black", '
-        '"bio": "Good author in Poland"'
-        "}"
-        "], "
-        '"books": ['
-        "{"
-        '"isbn": "1234567890123", '
-        '"title": "Harry Potter", '
-        '"year": 2024, "price": 20.5, '
-        '"authorId": 1'
-        "}"
-        "]"
-        "}"
+    catalog_json = json.loads(pathlib.Path("data_for_test.json").read_text())
+    catalog = CatalogDTO(**catalog_json)
+    assert catalog == CatalogDTO(**json.loads(catalog_to_json(catalog)))
+
+
+def test_dto_validation_error() -> None:
+    bad_book = BookDTOFactory.build(
+        isbn="123456",
+        factory_use_construct=True,
     )
-    catalog = CatalogDTO.model_validate_json(catalog_json)
-    assert catalog == CatalogDTO.model_validate_json(catalog_to_json(catalog))
+    catalog = CatalogDTOFactory.build(books=[bad_book])
+    catalog_json = json.loads(catalog_to_json(catalog))
+
+    with pytest.raises(ValidationError) as exc_info:
+        CatalogDTO(**catalog_json)
+
+    assert "ISBN must consist 13 numeric simbols" in str(exc_info.value)
