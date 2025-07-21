@@ -1,0 +1,18 @@
+{
+  "authors": [
+    {
+      "id": 1,
+      "full_name": "Tom Black",
+      "bio": "Good author in Poland"
+    }
+  ],
+  "books": [
+    {
+      "isbn": "1234567890123",
+      "title": "Harry Potter",
+      "year": 2024,
+      "price": 20.5,
+      "authorId": 1
+    }
+  ]
+}

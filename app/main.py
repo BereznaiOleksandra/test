@@ -2,6 +2,8 @@ import datetime
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+from pydantic import BaseModel, field_validator
+
 
 class AbstractPriceDiscount(ABC):
     def __init__(self, discount: float = 0):
@@ -122,6 +124,45 @@ class LibraryCatalog:
 
     def total_cost(self) -> float:
         return sum(book.price for book in self.books.values())
+
+
+class AuthorDTO(BaseModel):
+    id: int
+    full_name: str
+    bio: str
+
+
+class BookDTO(BaseModel):
+    isbn: str
+    title: str
+    year: int
+    price: float
+    authorId: int
+
+    @field_validator("isbn")
+    @classmethod
+    def check_isbn(cls, value: str) -> str:
+        if not value.isnumeric() or len(value) != 13:
+            raise ValueError("ISBN must consist 13 numeric simbols")
+        return value
+
+    @field_validator("year")
+    @classmethod
+    def check_year(cls, value: int) -> int:
+        if value < 0 or value > datetime.datetime.now().year:
+            raise ValueError(
+                f"Year of book must be positive and <= {datetime.datetime.now().year}"
+            )
+        return value
+
+
+class CatalogDTO(BaseModel):
+    authors: list[AuthorDTO]
+    books: list[BookDTO]
+
+
+def catalog_to_json(catalog: CatalogDTO) -> str:
+    return catalog.model_dump_json(indent=2)
 
 
 def main() -> None:
